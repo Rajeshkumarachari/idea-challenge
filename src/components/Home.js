@@ -1,46 +1,57 @@
 import React, { useEffect, useState } from "react";
-import Post from "./Post";
 import { IoIosAdd } from "react-icons/io";
 import axios from "axios";
+import Post from "./Post";
 
 const Home = () => {
   const [create, setCreate] = useState(false);
-  const [post, setPost] = useState([]);
-  const handleChange = (e) => {
-    console.log(e.target.value);
-    const { name, value } = e.target;
-    setPost((pState) => {
-      return { ...pState, [name]: value };
-    });
-  };
+  const [post, setPost] = useState({
+    id: "",
+    title: "",
+    description: "",
+    tags: "",
+  });
+  //const handleChange = (e) => {};
 
   useEffect(() => {
     axios
       .get("http://localhost:3000/post")
       .then((res) => setPost(res.data))
       .catch((error) => console.error(error));
+    console.log(post);
   }, []);
+  const postIdea = (e) => {
+    e.preventDefault();
+    const datas = {};
+    axios
+      .post("http://localhost:3000/post", { post: { title: "title" } })
+      .then((res) => setPost([...Post, res.data]))
+      .catch((error) => console.error(error));
+    console.log(post);
+  };
   return (
     <div>
       <div className="  grid sm:flex">
         {create && (
           <div className=" bg-blue-200 border w-full border-blue-300 rounded-xl py-5 my-10 mx-[322px]">
-            <form className="flex flex-col">
+            <form className="flex flex-col" onSubmit={postIdea}>
               <input
                 type="text "
                 name="title"
                 placeholder="Title"
                 value={post.title}
-                onChange={handleChange}
-                className=" w-fit border my-2 mx-2 px-2 py-1 rounded-sm border-green-400"
+                onChange={(e) => setPost({ ...post, title: e.target.value })}
+                className=" w-fit border text-2xl  font-semibold my-2 mx-2 px-2 py-1 rounded-sm border-green-400"
               />
               <textarea
                 type="textarea"
-                name="textarea"
-                value={post.textarea}
+                name="description"
+                value={post.description}
                 rows={9}
                 cols={13}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setPost({ ...post, description: e.target.value })
+                }
                 placeholder="Description"
                 className=" w-full h-[50px] my-2 mr-3 px-2 border border-green-400 "
               />
@@ -48,12 +59,13 @@ const Home = () => {
                 type="text"
                 name="tags"
                 value={post.tags}
-                onChange={handleChange}
+                onChange={(e) => setPost({ ...post, tags: e.target.value })}
                 placeholder="Tags"
-                className="  w-fit mx-2 px-2 py-2 border border-green-400 rounded-sm"
+                className="  w-fit text-base font-semibold mx-2 px-2 py-2 border border-green-400 rounded-sm"
               />
               <button
                 type="submit"
+                onClick={postIdea}
                 className=" border w-fit my-5 mx-5 px-2 py-2 bg-blue-500 text-white rounded-md"
               >
                 Create a post
